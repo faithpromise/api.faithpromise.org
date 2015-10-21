@@ -11,6 +11,14 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::group(['prefix' => 'v1'], function() {
+
+    Route::post('authenticate', 'AuthenticateController@authenticate');
+
+});
+
+Route::group(['prefix' => 'v1', 'middleware' => 'jwt.auth'], function() {
+
+    Route::get('/', 'AuthenticateController@index');
+
 });
