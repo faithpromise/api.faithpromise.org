@@ -147,7 +147,7 @@ return [
         */
 
         'auth' => function ($app) {
-            return new Tymon\JWTAuth\Providers\Auth\IlluminateAuthAdapter($app['auth']);
+            return new App\FaithPromise\AuthAdapter($app['auth']);
         },
 
         /*
