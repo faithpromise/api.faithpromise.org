@@ -4,10 +4,19 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "type": "project",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/faithpromise/f1api-php5"
+        }
+    ],
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.1.*",
-        "tymon/jwt-auth": "0.5.*"
+        "tymon/jwt-auth": "0.5.*",
+        "fellowshipone/f1api-php": "dev-master",
+        "guzzlehttp/guzzle": "~6.0",
+        "guzzlehttp/oauth-subscriber": "0.3.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
