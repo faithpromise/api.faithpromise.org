@@ -11,6 +11,8 @@
 |
 */
 
+require base_path('vendor/fellowshipone/f1api-php/src/fellowshipone/api.php');
+
 Route::group(['prefix' => 'v1'], function() {
 
     Route::post('authenticate', 'AuthenticateController@authenticate');
