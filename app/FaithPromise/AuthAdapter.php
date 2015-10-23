@@ -3,7 +3,9 @@
 namespace App\FaithPromise;
 
 use Exception;
+use F1\API;
 use Illuminate\Auth\AuthManager;
+use Illuminate\Support\Facades\App;
 use Tymon\JWTAuth\Providers\Auth\AuthInterface;
 
 class AuthAdapter implements AuthInterface {
@@ -26,7 +28,22 @@ class AuthAdapter implements AuthInterface {
      * @return bool
      */
     public function byCredentials(array $credentials = []) {
+
+
+        try {
+            $this->fellowshipOneAuth($credentials['email'], $credentials['password']);
+            return $this->byId();
+        } catch(\F1\Exception $e) {
+            return false;
+        } catch(Exception $e) {
+            return false;
+        }
+
+        dd('byCredentials');
+
         return $this->auth->once($credentials);
+
+
     }
 
     /**
@@ -50,5 +67,34 @@ class AuthAdapter implements AuthInterface {
      */
     public function user() {
         return $this->auth->user();
+    }
+
+    private function fellowshipOneAuth($username, $password = null) {
+
+        $f1 = App::make('faithpromise.fellowshipone.api');
+
+//        $f1 = new API([
+//            'key'     => env('F1_KEY'),
+//            'secret'  => env('F1_SECRET'),
+//            'baseUrl' => env('F1_API_URI')
+//        ]);
+
+        if (App::environment('local')) {
+            $f1->debug = true;
+        }
+
+        $f1->login2ndParty(
+            $username,
+            $password,
+            API::TOKEN_CACHE_CUSTOM,
+            [
+                'setAccessToken' => function($username, $token = null) {
+
+                },
+                'getAccessToken' => function($username) {
+
+                }
+            ]
+        );
     }
 }
