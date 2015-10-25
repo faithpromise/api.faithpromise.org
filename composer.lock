@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "455e42256fb97797d8ce91dd9f4d7f75",
-    "content-hash": "27c0fd3b38d536e19674578eb0e3ec70",
+    "hash": "24537445f98ac9860598d35b942516c2",
+    "content-hash": "c0e3be183dff40a8335489a207d49dc5",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -216,35 +216,6 @@
                 "string"
             ],
             "time": "2014-12-20 21:24:13"
-        },
-        {
-            "name": "fellowshipone/f1api-php",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/faithpromise/f1api-php5.git",
-                "reference": "93e0a472cefbc6a329e444b1deebc8b7b105c00e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/faithpromise/f1api-php5/zipball/93e0a472cefbc6a329e444b1deebc8b7b105c00e",
-                "reference": "93e0a472cefbc6a329e444b1deebc8b7b105c00e",
-                "shasum": ""
-            },
-            "require": {
-                "ext-oauth": "*",
-                "php": ">=5.3.3"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "description": "Client library for FellowshipOne API",
-            "homepage": "https://github.com/fellowshiptech/f1api-php5",
-            "keywords": [
-                "api",
-                "fellowshipone",
-                "oauth"
-            ],
-            "time": "2014-04-10 14:05:21"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -3480,9 +3451,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "fellowshipone/f1api-php": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
