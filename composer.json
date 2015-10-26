@@ -15,7 +15,8 @@
         "laravel/framework": "5.1.*",
         "tymon/jwt-auth": "0.5.*",
         "guzzlehttp/guzzle": "~6.0",
-        "guzzlehttp/oauth-subscriber": "0.3.*"
+        "guzzlehttp/oauth-subscriber": "0.3.*",
+        "barryvdh/laravel-cors": "0.7.x"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
