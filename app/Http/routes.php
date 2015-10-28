@@ -13,24 +13,23 @@
 
 //require base_path('vendor/fellowshipone/f1api-php/src/fellowshipone/api.php');
 
-Route::group(['prefix' => 'v1'], function() {
 
-    Route:post('/auth/request-token', function() {
+Route::group(['prefix' => 'v1', 'middleware' => 'cors'], function() {
 
-        $key = env('F1_KEY');
-        $secret = env('F1_SECRET');
-        $uri = env('F1_API_URI');
-
-        $f1 = new \App\FaithPromise\F1\FellowshipOne($key, $secret, $uri);
-
-        $test = $f1->obtainRequestToken();
-
-        return response()->json(['oauth_token' => $test->oauth_token]);
-
-    });
+    Route::post('/auth/request-token', 'FellowshipOneAuthController@requestToken'); // TODO: switch back to POST
+    Route::any('/auth/access-token', 'FellowshipOneAuthController@accessToken');
 
     Route::post('authenticate', 'AuthenticateController@authenticate');
 
+    Route::get('test', function() {
+
+        $uri = 'https://foo.com/this/that';
+        $uri = preg_replace('/(?:\.json)+$/', '', $uri) . '.json';
+
+        dd($uri);
+
+        return 'test page here';
+    });
 });
 
 Route::group(['prefix' => 'v1', 'middleware' => 'jwt.auth'], function() {

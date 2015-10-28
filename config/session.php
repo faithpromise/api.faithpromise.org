@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\App;
+
 return [
 
     /*
@@ -135,7 +137,7 @@ return [
     |
     */
 
-    'domain' => null,
+    'domain' => env('COOKIE_DOMAIN', '.faithpromise.org'),
 
     /*
     |--------------------------------------------------------------------------

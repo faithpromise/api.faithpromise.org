@@ -2,6 +2,7 @@
 
 namespace App\FaithPromise\F1;
 
+use App\FaithPromise\F1\Exception;
 use App\Http\Requests\Request;
 use Illuminate\Support\Facades\Session;
 use \OAuth;
@@ -9,41 +10,254 @@ use \OAuth;
 class FellowshipOne implements FellowshipOneInterface {
 
     const F1_REQUEST_TOKEN_PATH = '/Tokens/RequestToken';
+    const F1_ACCESS_TOKEN_PATH = '/Tokens/AccessToken';
+
+    const REQUEST_TOKEN_KEY = 'f1_request_token';
+    const REQUEST_SECRET_KEY = 'f1_request_secret';
+    const ACCESS_TOKEN_KEY = 'f1_request_token';
+    const ACCESS_SECRET_KEY = 'f1_request_secret';
+    const USER_ID_KEY = 'f1_user_location';
+
+    protected $headers = [];
+    protected $content_type = 'json';
 
     public function __construct($key, $secret, $uri) {
 
         $this->settings = [
-            'key'    => $key,
-            'secret' => $secret,
-            'uri'    => $uri
+            'key'               => $key,
+            'secret'            => $secret,
+            'uri'               => $uri,
+            'uri_request_token' => $uri . self::F1_REQUEST_TOKEN_PATH,
+            'uri_access_token'  => $uri . self::F1_ACCESS_TOKEN_PATH
         ];
 
     }
 
     public function obtainRequestToken() {
 
-        $url = $this->settings['uri'] . self::F1_REQUEST_TOKEN_PATH;
-        $client = new \OAuth($this->settings['key'], $this->settings['secret'], OAUTH_SIG_METHOD_HMACSHA1);
+        $request_token = (object)$this
+            ->getOauthClient()
+            ->getAccessToken($this->settings['uri_request_token']); // TODO: Should this be getRequestToken()?
 
-        $response = (object)$client->getAccessToken($url);
+        $this
+            ->storeRequestToken($request_token->oauth_token)
+            ->storeRequestSecret($request_token->oauth_token_secret);
 
-        /* oauth_token & oauth_token_secret */
-        Session::put('f1tokens', $response);
-
-        return $response;
-
-    }
-
-    public function login($username, $password) {
-
+        return $request_token->oauth_token;
 
     }
 
-    public function loginViaRedirect($username, $password) {
+    public function obtainAccessToken($oauthToken) {
 
+        $request_token = $this->getRequestToken();
+        $request_secret = $this->getRequestSecret();
+
+        $url = $this->settings['uri'] . self::F1_ACCESS_TOKEN_PATH;
+
+        // Validate the $oauthToken against the oauth_token from the first request
+        if ($oauthToken !== $request_token) {
+            throw new Exception('Returned OAuth Token Does Not Match Request Token');
+        }
+
+        try {
+
+            $client = $this->getOauthClient($request_token, $request_secret);
+            $access_token = (object)$client->getAccessToken($this->settings['uri_access_token']);
+
+            $user_id = $this->getCurrentUserIdFromHeader();
+
+            $this
+                ->storeAccessToken($access_token->oauth_token)
+                ->storeAccessSecret($access_token->oauth_token_secret)
+                ->storeUserId($user_id);
+
+            return $access_token; // TODO: What needs to be returned here?
+
+        } catch (\OAuthException $e) {
+
+            $previous = isset($client) ? $client->getLastResponse() : '';
+
+            throw new Exception($e->getMessage(), $e->getCode(), $previous, array('url' => $url), $e);
+        }
 
     }
+
+    public function getCurrentUserIdFromHeader() {
+        $location_header = $this->getContentLocationHeader();
+        preg_match('/[0-9]+$/', $location_header, $matches);
+        return $matches[0];
+    }
+
+    public function obtainCurrentUser() {
+
+        $uri = $this->settings['uri'] . '/People/' . $this->getUserId() . '/Communications';
+        $user = $this->fetch($uri);
+
+        dd($user);
+
+    }
+
+    private function getOauthClient($token = null, $secret = null) {
+
+        if (!isset($this->client)) {
+            $this->client = new \OAuth($this->settings['key'], $this->settings['secret'], OAUTH_SIG_METHOD_HMACSHA1);
+        }
+
+        if ($token !== null && $secret !== null) {
+            $this->client->setToken($token, $secret);
+        }
+
+        return $this->client;
+    }
+
+    private function fetch($uri, $data = null, $method = OAUTH_HTTP_METHOD_GET, $retryCount = 0) {
+
+        $uri = $this->cleanUri($uri);
+
+        $headers = ['Content-Type' => 'application/' . $this->getContentType()];
+
+        if (preg_match('[array|object]', gettype($data))) {
+            $data = json_encode($data);
+        }
+
+        $client = $this->getOauthClient($this->getAccessToken(), $this->getAccessSecret());
+        $client->disableSSLChecks();
+
+        try {
+
+            $client->fetch($uri, $data, $method, $headers);
+
+            return json_decode($client->getLastResponse(), true);
+
+        } catch (\OAuthException $e) {
+
+            // TODO: Retry like F1api-php5? They look for 400 though, which means don't try again without modifications
+
+            $extra = array(
+                'data'       => $data,
+                'url'        => $uri,
+                'method'     => $method,
+                'headers'    => $this->getLastResponseHeaders(),
+                'retryCount' => $retryCount,
+            );
+
+            throw new Exception($e->getMessage(), $e->getCode(), $client->getLastResponse(), $extra, $e);
+        }
+
+    }
+
+    private function oauth_get($uri, $data) {
+
+        $uri = $uri . '?' . http_build_query($data);
+
+        return $this->fetch($uri, null, OAUTH_HTTP_METHOD_GET);
+
+    }
+
+    private function cleanUri($uri) {
+
+        // Make sure content type is appended to URI
+        $content_type = $this->getContentType();
+        $uri = preg_replace('/(?:\.' . $content_type . ')+$/', '', $uri) . '.' . $content_type;
+
+        return $uri;
+    }
+
+    private function getContentType() {
+        return $this->content_type;
+    }
+
+    /**
+     * @return array
+     */
+    private function getLastResponseHeaders() {
+
+        $header_str = $this->getOauthClient()->getLastResponseHeaders();
+        $key = hash('md5', $header_str);
+
+        if (!array_key_exists($key, $this->headers)) {
+
+            $headers = [];
+            $fields = explode("\r\n", preg_replace('/\x0D\x0A[\x09\x20]+/', ' ', $header_str));
+
+            foreach ($fields as $field) {
+                if (preg_match('/([^:]+): (.+)/m', $field, $match)) {
+                    $match[1] = preg_replace_callback('/(?<=^|[\x09\x20\x2D])./', function ($m) {
+                        return strtoupper($m[0]);
+                    }, strtolower(trim($match[1])));
+                    if (isset($headers[$match[1]])) {
+                        $headers[$match[1]] = array($headers[$match[1]], $match[2]);
+                    } else {
+                        $headers[$match[1]] = trim($match[2]);
+                    }
+                }
+            }
+
+            $this->headers[$key] = $headers;
+        }
+
+        return $this->headers[$key];
+    }
+
+    private function getContentLocationHeader() {
+
+        $headers = $this->getLastResponseHeaders();
+
+        return isset($headers['Content-Location']) ? $headers['Content-Location'] : null;
+    }
+
+    private function getRequestToken() {
+        return Session::get(self::REQUEST_TOKEN_KEY);
+    }
+
+    private function storeRequestToken($value) {
+        Session::set(self::REQUEST_TOKEN_KEY, $value);
+
+        return $this;
+    }
+
+    private function getRequestSecret() {
+        return Session::get(self::REQUEST_SECRET_KEY);
+    }
+
+    private function storeRequestSecret($value) {
+        Session::set(self::REQUEST_SECRET_KEY, $value);
+
+        return $this;
+    }
+
+    private function getAccessToken() {
+        return Session::get(self::ACCESS_TOKEN_KEY);
+    }
+
+    private function storeAccessToken($value) {
+        Session::set(self::ACCESS_TOKEN_KEY, $value);
+
+        return $this;
+    }
+
+    private function getAccessSecret() {
+        return Session::get(self::ACCESS_SECRET_KEY);
+    }
+
+    private function storeAccessSecret($value) {
+        Session::set(self::ACCESS_SECRET_KEY, $value);
+
+        return $this;
+    }
+
+    private function getUserId() {
+        return Session::get(self::USER_ID_KEY);
+    }
+
+    private function storeUserId($value) {
+        Session::set(self::USER_ID_KEY, $value);
+
+        return $this;
+    }
+
 }
+
 //
 //    {#183
 //        +"oauth_token": "22b2f714-1888-49b1-b708-e37a59a7046c"
