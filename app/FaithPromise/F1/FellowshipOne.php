@@ -1,6 +1,6 @@
 <?php
 
-namespace App\FaithPromise\F1;
+namespace FaithPromise\F1;
 
 use App\FaithPromise\F1\Exception;
 use App\Http\Requests\Request;

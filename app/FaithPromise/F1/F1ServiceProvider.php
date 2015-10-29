@@ -1,6 +1,6 @@
 <?php
 
-use App\FaithPromise\F1\FellowshipOneApi;
+use FaithPromise\F1\FellowshipOne;
 use Illuminate\Support\ServiceProvider;
 
 class F1ServiceProvider extends ServiceProvider {

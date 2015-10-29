@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use FaithPromise\F1\FellowshipOne;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 

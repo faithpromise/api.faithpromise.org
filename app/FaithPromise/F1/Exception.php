@@ -1,6 +1,6 @@
 <?php
 
-namespace App\FaithPromise\F1;
+namespace FaithPromise\F1;
 
 class Exception extends \Exception {
 
