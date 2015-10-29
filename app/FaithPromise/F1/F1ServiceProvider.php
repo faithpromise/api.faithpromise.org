@@ -9,7 +9,7 @@ class F1ServiceProvider extends ServiceProvider {
 
         $this->app->bind('faithpromise.f1.api', function ($app) {
 
-            return new FellowshipOneApi(config('fellowshipone'));
+            return new FellowshipOne(config('fellowshipone'));
         });
 
     }
