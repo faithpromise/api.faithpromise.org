@@ -3,7 +3,6 @@
 namespace App\FaithPromise;
 
 use Exception;
-use F1\API;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Support\Facades\App;
 use Tymon\JWTAuth\Providers\Auth\AuthInterface;
@@ -33,8 +32,6 @@ class AuthAdapter implements AuthInterface {
         try {
             $this->fellowshipOneAuth($credentials['email'], $credentials['password']);
             return $this->byId();
-        } catch(\F1\Exception $e) {
-            return false;
         } catch(Exception $e) {
             return false;
         }

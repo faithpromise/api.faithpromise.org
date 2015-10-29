@@ -1,6 +1,6 @@
 <?php
 
-namespace FaithPromise\F1;
+namespace FaithPromise\FellowshipOne;
 
 class Exception extends \Exception {
 

@@ -6,10 +6,9 @@
  * Time: 12:51 PM
  */
 
-namespace app\FaithPromise\F1;
+namespace FaithPromise\FellowshipOne;
 
-
-interface FellowshipOneInterface {
+interface AuthInterface {
 
     public function obtainRequestToken();
 

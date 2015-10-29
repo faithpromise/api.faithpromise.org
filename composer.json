@@ -30,7 +30,7 @@
         ],
         "psr-4": {
             "App\\": "app/",
-            "FaithPromise\\": "app/FaithPromise/"
+            "FaithPromise\\FellowshipOne\\": "app/FaithPromise/FellowshipOne/src/"
         }
     },
     "autoload-dev": {

@@ -16,10 +16,10 @@
 
 Route::group(['prefix' => 'v1', 'middleware' => 'cors'], function() {
 
-    Route::post('/auth/request-token', 'FellowshipOneAuthController@requestToken'); // TODO: switch back to POST
-    Route::any('/auth/access-token', 'FellowshipOneAuthController@accessToken');
+    Route::any('/auth/request-token', 'AuthController@requestToken'); // TODO: switch back to POST
+    Route::any('/auth/access-token', 'AuthController@accessToken');
 
-    Route::post('authenticate', 'AuthenticateController@authenticate');
+//    Route::post('authenticate', 'AuthController@authenticate');
 
     Route::get('test', function() {
 

@@ -1,13 +1,11 @@
 <?php
 
-namespace FaithPromise\F1;
+namespace FaithPromise\FellowshipOne;
 
-use App\FaithPromise\F1\Exception;
-use App\Http\Requests\Request;
 use Illuminate\Support\Facades\Session;
-use \OAuth;
+use OAuth;
 
-class FellowshipOne implements FellowshipOneInterface {
+class Auth implements AuthInterface {
 
     const F1_REQUEST_TOKEN_PATH = '/Tokens/RequestToken';
     const F1_ACCESS_TOKEN_PATH = '/Tokens/AccessToken';

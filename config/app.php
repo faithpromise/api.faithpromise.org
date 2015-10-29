@@ -147,6 +147,8 @@ return [
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
         Barryvdh\Cors\ServiceProvider::class,
 
+        FaithPromise\FellowshipOne\ServiceProvider::class,
+
     ],
 
     /*
