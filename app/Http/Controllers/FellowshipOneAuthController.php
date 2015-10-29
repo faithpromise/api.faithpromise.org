@@ -15,7 +15,7 @@ class FellowshipOneAuthController extends BaseController {
         $secret = env('F1_SECRET');
         $uri = env('F1_API_URI');
 
-        $f1 = new \App\FaithPromise\F1\FellowshipOne($key, $secret, $uri);
+        $f1 = new FellowshipOne($key, $secret, $uri);
 
         $oauth_token = $f1->obtainRequestToken();
 
