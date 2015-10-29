@@ -69,7 +69,7 @@ class Auth implements AuthInterface {
                 ->storeAccessSecret($access_token->oauth_token_secret)
                 ->storeUserId($user_id);
 
-            return $access_token; // TODO: What needs to be returned here?
+            return $this; // TODO: What needs to be returned here?
 
         } catch (\OAuthException $e) {
 

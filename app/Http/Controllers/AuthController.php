@@ -49,20 +49,13 @@ class AuthController extends Controller {
      */
     public function accessToken(Request $request) {
 
-        $key = env('F1_KEY');
-        $secret = env('F1_SECRET');
-        $uri = env('F1_API_URI');
         $oauth_token = $request->input('oauth_token');
 
-        $f1 = new Auth($key, $secret, $uri);
+        $auth = AuthFacade::obtainAccessToken($oauth_token);
 
-        $response = $f1->obtainAccessToken($oauth_token);
+        $user = $auth->obtainCurrentUser();
 
-        $user = $f1->obtainCurrentUser();
-
-        var_dump($response);
-        dd($user);
-
+        var_dump($user);
 
     }
 
