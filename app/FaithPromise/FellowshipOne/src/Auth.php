@@ -14,7 +14,8 @@ class Auth implements AuthInterface {
     const REQUEST_SECRET_KEY = 'f1_request_secret';
     const ACCESS_TOKEN_KEY = 'f1_request_token';
     const ACCESS_SECRET_KEY = 'f1_request_secret';
-    const USER_ID_KEY = 'f1_user_location';
+    const USER_KEY = 'f1_user';
+    const USER_LOCATION_KEY = 'f1_user_location';
 
     protected $headers = [];
     protected $content_type = 'json';
@@ -35,7 +36,7 @@ class Auth implements AuthInterface {
 
         $request_token = (object)$this
             ->getOauthClient()
-            ->getAccessToken($this->settings['uri_request_token']); // TODO: Should this be getRequestToken()?
+            ->getRequestToken($this->settings['uri_request_token']);
 
         $this
             ->storeRequestToken($request_token->oauth_token)
@@ -50,8 +51,6 @@ class Auth implements AuthInterface {
         $request_token = $this->getRequestToken();
         $request_secret = $this->getRequestSecret();
 
-        $url = $this->settings['uri'] . self::F1_ACCESS_TOKEN_PATH;
-
         // Validate the $oauthToken against the oauth_token from the first request
         if ($oauthToken !== $request_token) {
             throw new Exception('Returned OAuth Token Does Not Match Request Token: ' . $request_token);
@@ -62,12 +61,10 @@ class Auth implements AuthInterface {
             $client = $this->getOauthClient($request_token, $request_secret);
             $access_token = (object)$client->getAccessToken($this->settings['uri_access_token']);
 
-            $user_id = $this->getCurrentUserIdFromHeader();
-
             $this
                 ->storeAccessToken($access_token->oauth_token)
                 ->storeAccessSecret($access_token->oauth_token_secret)
-                ->storeUserId($user_id);
+                ->storeUserLocation($this->getContentLocationHeader());
 
             return $this; // TODO: What needs to be returned here?
 
@@ -75,24 +72,29 @@ class Auth implements AuthInterface {
 
             $previous = isset($client) ? $client->getLastResponse() : '';
 
-            throw new Exception($e->getMessage(), $e->getCode(), $previous, array('url' => $url), $e);
+            throw new Exception($e->getMessage(), $e->getCode(), $previous, array('url' => $this->settings['uri_access_token']), $e);
         }
 
     }
 
-    public function getCurrentUserIdFromHeader() {
-        $location_header = $this->getContentLocationHeader();
-        preg_match('/[0-9]+$/', $location_header, $matches);
-        return $matches[0];
+    public function getUserId() {
+        $user = $this->getUser();
+
+        return $user['@id'];
     }
 
-    public function obtainCurrentUser() {
+    private function getUser() {
 
-        $uri = $this->settings['uri'] . '/People/' . $this->getUserId();
-        $user = $this->fetch($uri);
+        if (!Session::has(self::USER_KEY)) {
+            $user = $this->obtainUser();
+            $this->storeUser($user['person']);
+        }
 
-        dd($user);
+        return Session::get(self::USER_KEY);
+    }
 
+    private function obtainUser() {
+        return $this->fetch($this->getUserLocation());
     }
 
     private function getOauthClient($token = null, $secret = null) {
@@ -171,30 +173,23 @@ class Auth implements AuthInterface {
     private function getLastResponseHeaders() {
 
         $header_str = $this->getOauthClient()->getLastResponseHeaders();
-        $key = hash('md5', $header_str);
+        $headers = [];
+        $fields = explode("\r\n", preg_replace('/\x0D\x0A[\x09\x20]+/', ' ', $header_str));
 
-        if (!array_key_exists($key, $this->headers)) {
-
-            $headers = [];
-            $fields = explode("\r\n", preg_replace('/\x0D\x0A[\x09\x20]+/', ' ', $header_str));
-
-            foreach ($fields as $field) {
-                if (preg_match('/([^:]+): (.+)/m', $field, $match)) {
-                    $match[1] = preg_replace_callback('/(?<=^|[\x09\x20\x2D])./', function ($m) {
-                        return strtoupper($m[0]);
-                    }, strtolower(trim($match[1])));
-                    if (isset($headers[$match[1]])) {
-                        $headers[$match[1]] = array($headers[$match[1]], $match[2]);
-                    } else {
-                        $headers[$match[1]] = trim($match[2]);
-                    }
+        foreach ($fields as $field) {
+            if (preg_match('/([^:]+): (.+)/m', $field, $match)) {
+                $match[1] = preg_replace_callback('/(?<=^|[\x09\x20\x2D])./', function ($m) {
+                    return strtoupper($m[0]);
+                }, strtolower(trim($match[1])));
+                if (isset($headers[$match[1]])) {
+                    $headers[$match[1]] = array($headers[$match[1]], $match[2]);
+                } else {
+                    $headers[$match[1]] = trim($match[2]);
                 }
             }
-
-            $this->headers[$key] = $headers;
         }
 
-        return $this->headers[$key];
+        return $headers;
     }
 
     private function getContentLocationHeader() {
@@ -244,12 +239,18 @@ class Auth implements AuthInterface {
         return $this;
     }
 
-    private function getUserId() {
-        return Session::get(self::USER_ID_KEY);
+    private function storeUser($value) {
+        Session::set(self::USER_KEY, $value);
+
+        return $this;
     }
 
-    private function storeUserId($value) {
-        Session::set(self::USER_ID_KEY, $value);
+    private function getUserLocation() {
+        return Session::get(self::USER_LOCATION_KEY);
+    }
+
+    private function storeUserLocation($value) {
+        Session::set(self::USER_LOCATION_KEY, $value);
 
         return $this;
     }
