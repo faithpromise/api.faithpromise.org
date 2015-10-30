@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use App\User;
 use FaithPromise\FellowshipOne\AuthFacade;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -12,46 +13,59 @@ class AuthController extends Controller {
 
     /**
      * Called by client (Satellizer) to get an OAuth request token
-     * from FellowshipOne
+     * from FellowshipOne, then a second time to get access token.
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
-    public function requestToken() {
+    public function fellowshipone(Request $request) {
+
+        // First step for request token
+        if (! $request->has('oauth_token')) {
+            return $this->handleRequestToken($request);
+        }
+
+        // Second step for access token
+        return $this->handleAccessToken($request);
+
+    }
+
+    private function handleRequestToken(Request $request) {
 
         return response()->json([
             'oauth_token'    => AuthFacade::obtainRequestToken(),
-            'oauth_callback' => url(route('accessToken'))
+            'oauth_callback' => $request->server('HTTP_REFERER')
         ]);
 
     }
 
-    /**
-     * Successful FellowshipOne login will redirect back to our app
-     * and call this method.
-     *
-     * @param Request $request
-     * @throws \FaithPromise\FellowshipOne\Exception
-     */
-    public function accessToken(Request $request) {
+    private function handleAccessToken(Request $request) {
 
         $oauth_token = $request->input('oauth_token');
 
         $auth = AuthFacade::obtainAccessToken($oauth_token);
 
-        $user = $auth->obtainCurrentUser();
+        $fellowship_one_user_id = $auth->getUserId();
 
-        dd($user);
+        $user = User::whereFellowshipOneUserId($fellowship_one_user_id)->first();
 
-//        $credentials = $request->only($user->email, 'password');
-//
-//        try {
-//            if (!$token = JWTAuth::attempt($credentials)) {
-//                return response()->json(['error' => 'invalid_credentials'], 401);
-//            }
-//        } catch (JWTException $e) {
-//            return response()->json(['error' => 'could_not_create_token'], 500);
-//        }
-//
-//        return response()->json(compact('token'));
+        if ($user) {
+
+            try {
+                if (!$token = JWTAuth::fromUser($user)) {
+                    return response()->json(['error' => 'invalid_credentials'], 401);
+                }
+            } catch (JWTException $e) {
+                return response()->json(['error' => 'could_not_create_token'], 500);
+            }
+
+            return response()->json(compact('token'));
+
+        }
+
+        // No user found
+        // TODO: Return msg to client for email verification step
+        throw new \Exception('No user found yo');
 
     }
 
