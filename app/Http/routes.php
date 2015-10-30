@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Route;
  */
 Route::group(['prefix' => 'v1', 'middleware' => 'cors'], function() {
 
-    Route::post('/auth/request-token', 'AuthController@requestToken');
-    Route::any('/auth/access-token', 'AuthController@accessToken');
+    Route::any('/auth/request-token', ['as' => 'requestToken', 'uses' => 'AuthController@requestToken']);
+    Route::any('/auth/access-token', ['as' => 'accessToken', 'uses' => 'AuthController@accessToken']);
 
 //    Route::post('authenticate', 'AuthController@authenticate');
 

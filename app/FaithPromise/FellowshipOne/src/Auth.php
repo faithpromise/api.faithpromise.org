@@ -54,7 +54,7 @@ class Auth implements AuthInterface {
 
         // Validate the $oauthToken against the oauth_token from the first request
         if ($oauthToken !== $request_token) {
-            throw new Exception('Returned OAuth Token Does Not Match Request Token');
+            throw new Exception('Returned OAuth Token Does Not Match Request Token: ' . $request_token);
         }
 
         try {
@@ -88,7 +88,7 @@ class Auth implements AuthInterface {
 
     public function obtainCurrentUser() {
 
-        $uri = $this->settings['uri'] . '/People/' . $this->getUserId() . '/Communications';
+        $uri = $this->settings['uri'] . '/People/' . $this->getUserId();
         $user = $this->fetch($uri);
 
         dd($user);

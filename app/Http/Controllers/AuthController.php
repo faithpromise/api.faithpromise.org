@@ -10,22 +10,6 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller {
 
-    public function authenticate(Request $request) {
-
-        $credentials = $request->only('email', 'password');
-
-        try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'invalid_credentials'], 401);
-            }
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'could_not_create_token'], 500);
-        }
-
-        return response()->json(compact('token'));
-
-    }
-
     /**
      * Called by client (Satellizer) to get an OAuth request token
      * from FellowshipOne
@@ -35,7 +19,7 @@ class AuthController extends Controller {
 
         return response()->json([
             'oauth_token'    => AuthFacade::obtainRequestToken(),
-            'oauth_callback' => url('/v1/auth/access-token') // TODO: Use named route
+            'oauth_callback' => url(route('accessToken'))
         ]);
 
     }
@@ -55,7 +39,19 @@ class AuthController extends Controller {
 
         $user = $auth->obtainCurrentUser();
 
-        var_dump($user);
+        dd($user);
+
+//        $credentials = $request->only($user->email, 'password');
+//
+//        try {
+//            if (!$token = JWTAuth::attempt($credentials)) {
+//                return response()->json(['error' => 'invalid_credentials'], 401);
+//            }
+//        } catch (JWTException $e) {
+//            return response()->json(['error' => 'could_not_create_token'], 500);
+//        }
+//
+//        return response()->json(compact('token'));
 
     }
 
