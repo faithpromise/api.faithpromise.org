@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'v1', 'middleware' => 'cors'], function() {
 
     Route::any('/auth/fellowshipone', ['as' => 'authEndpoint', 'uses' => 'AuthController@fellowshipone']);
-
-//    Route::post('authenticate', 'AuthController@authenticate');
+    Route::post('auth/register', 'AuthController@register');
+    Route::get('auth/verify-email', 'AuthController@verifyEmail');
 
 });
 
