@@ -63,8 +63,6 @@ class AuthController extends Controller {
 
             $payload = JWTAuth::parseToken()->getPayload();
 
-
-
             // Create the user
             $user = new User;
             $user->email = $email;
@@ -72,10 +70,9 @@ class AuthController extends Controller {
             $user->fellowship_one_user_id = $payload->get('fellowship_one_user_id');
             $user->save();
 
-
             $new_token = JWTAuth::fromUser($user, [
-                'oauth_token'        => $auth['oauth_token'],
-                'oauth_token_secret' => $auth['oauth_token_secret']
+                'oauth_token'        => $payload->get('oauth_token'),
+                'oauth_token_secret' => $payload->get('oauth_token_secret')
             ]);
 
         }
