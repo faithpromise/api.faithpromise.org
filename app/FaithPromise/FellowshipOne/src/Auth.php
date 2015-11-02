@@ -2,6 +2,7 @@
 
 namespace FaithPromise\FellowshipOne;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use OAuth;
 
@@ -34,45 +35,37 @@ class Auth implements AuthInterface {
 
     public function obtainRequestToken() {
 
-        $request_token = (object)$this
+        $request_token = $this
             ->getOauthClient()
             ->getRequestToken($this->settings['uri_request_token']);
 
-        $this
-            ->storeRequestToken($request_token->oauth_token)
-            ->storeRequestSecret($request_token->oauth_token_secret);
+        $this->storeRequestToken($request_token);
 
-        return $request_token->oauth_token;
+        return $request_token['oauth_token'];
 
     }
 
     public function obtainAccessToken($oauthToken) {
 
-        $request_token = $this->getRequestToken();
-        $request_secret = $this->getRequestSecret();
-
-        // Validate the $oauthToken against the oauth_token from the first request
-        if ($oauthToken !== $request_token) {
-            throw new Exception('Returned OAuth Token Does Not Match Request Token: ' . $request_token);
-        }
+        $request_token = $this->getRequestToken($oauthToken);
+        $oauth_token_secret = isset($request_token['oauth_token_secret']) ? $request_token['oauth_token_secret']  : null;
 
         try {
 
-            $client = $this->getOauthClient($request_token, $request_secret);
-            $access_token = (object)$client->getAccessToken($this->settings['uri_access_token']);
+            $client = $this->getOauthClient($oauthToken, $oauth_token_secret);
+            $access_token = $client->getAccessToken($this->settings['uri_access_token']);
 
-            $this
-                ->storeAccessToken($access_token->oauth_token)
-                ->storeAccessSecret($access_token->oauth_token_secret)
-                ->storeUserLocation($this->getContentLocationHeader());
-
-            return $this; // TODO: What needs to be returned here?
+            return [
+                'oauth_token'        => $access_token['oauth_token'],
+                'oauth_token_secret' => $access_token['oauth_token_secret'],
+                'user_id'            => $this->getCurrentUserIdFromHeader()
+            ];
 
         } catch (\OAuthException $e) {
 
             $previous = isset($client) ? $client->getLastResponse() : '';
 
-            throw new Exception($e->getMessage(), $e->getCode(), $previous, array('url' => $this->settings['uri_access_token']), $e);
+            throw new Exception($e->getMessage(), $e->getCode(), $previous, ['url' => $this->settings['uri_access_token']], $e);
         }
 
     }
@@ -81,6 +74,14 @@ class Auth implements AuthInterface {
         $user = $this->getUser();
 
         return $user['@id'];
+    }
+
+    public function getCurrentUserIdFromHeader() {
+
+        $location_header = $this->getContentLocationHeader();
+        preg_match('/[0-9]+$/', $location_header, $matches);
+
+        return $matches[0];
     }
 
     private function getUser() {
@@ -133,13 +134,13 @@ class Auth implements AuthInterface {
 
             // TODO: Retry like F1api-php5? They look for 400 though, which means don't try again without modifications
 
-            $extra = array(
+            $extra = [
                 'data'       => $data,
                 'url'        => $uri,
                 'method'     => $method,
                 'headers'    => $this->getLastResponseHeaders(),
                 'retryCount' => $retryCount,
-            );
+            ];
 
             throw new Exception($e->getMessage(), $e->getCode(), $client->getLastResponse(), $extra, $e);
         }
@@ -182,7 +183,7 @@ class Auth implements AuthInterface {
                     return strtoupper($m[0]);
                 }, strtolower(trim($match[1])));
                 if (isset($headers[$match[1]])) {
-                    $headers[$match[1]] = array($headers[$match[1]], $match[2]);
+                    $headers[$match[1]] = [$headers[$match[1]], $match[2]];
                 } else {
                     $headers[$match[1]] = trim($match[2]);
                 }
@@ -199,22 +200,17 @@ class Auth implements AuthInterface {
         return isset($headers['Content-Location']) ? $headers['Content-Location'] : null;
     }
 
-    private function getRequestToken() {
-        return Session::get(self::REQUEST_TOKEN_KEY);
+    private function getRequestToken($oauth_token) {
+
+        $key = $oauth_token;
+        return Cache::get($key);
+
     }
 
     private function storeRequestToken($value) {
-        Session::set(self::REQUEST_TOKEN_KEY, $value);
 
-        return $this;
-    }
-
-    private function getRequestSecret() {
-        return Session::get(self::REQUEST_SECRET_KEY);
-    }
-
-    private function storeRequestSecret($value) {
-        Session::set(self::REQUEST_SECRET_KEY, $value);
+        $key = $value['oauth_token'];
+        Cache::put($key, $value, 5);
 
         return $this;
     }

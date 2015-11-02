@@ -21,7 +21,7 @@ class AuthController extends Controller {
     public function fellowshipone(Request $request) {
 
         // First step for request token
-        if (! $request->has('oauth_token')) {
+        if (!$request->has('oauth_token')) {
             return $this->handleRequestToken($request);
         }
 
@@ -33,7 +33,7 @@ class AuthController extends Controller {
     private function handleRequestToken(Request $request) {
 
         return response()->json([
-            'oauth_token'    => AuthFacade::obtainRequestToken(),
+            'oauth_token' => AuthFacade::obtainRequestToken(),
             'oauth_callback' => $request->server('HTTP_REFERER')
         ]);
 
@@ -41,31 +41,30 @@ class AuthController extends Controller {
 
     private function handleAccessToken(Request $request) {
 
-        $oauth_token = $request->input('oauth_token');
+        $auth = AuthFacade::obtainAccessToken($request->input('oauth_token'));
+        $user = User::whereFellowshipOneUserId($auth['user_id'])->first();
 
-        $auth = AuthFacade::obtainAccessToken($oauth_token);
-
-        $fellowship_one_user_id = $auth->getUserId();
-
-        $user = User::whereFellowshipOneUserId($fellowship_one_user_id)->first();
-
-        if ($user) {
-
-            try {
-                if (!$token = JWTAuth::fromUser($user)) {
-                    return response()->json(['error' => 'invalid_credentials'], 401);
-                }
-            } catch (JWTException $e) {
-                return response()->json(['error' => 'could_not_create_token'], 500);
-            }
-
-            return response()->json(compact('token'));
-
+        if (!$user) {
+            $user = new User();
+            $user->id = 0;
         }
 
-        // No user found
-        // TODO: Return msg to client for email verification step
-        throw new \Exception('No user found yo');
+        try {
+
+            $token = JWTAuth::fromUser($user, [
+                'oauth_token'        => $auth['oauth_token'],
+                'oauth_token_secret' => $auth['oauth_token_secret']
+            ]);
+
+            if (!$token) {
+                return response()->json(['error' => 'invalid_credentials'], 401);
+            }
+
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'could_not_create_token'], 500);
+        }
+
+        return response()->json(compact('token', 'user'));
 
     }
 
