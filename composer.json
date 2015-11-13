@@ -7,7 +7,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/faithpromise/f1api-php5"
+            "url": "https://github.com/faithpromise/fp-shared.git"
         }
     ],
     "require": {
@@ -16,7 +16,11 @@
         "tymon/jwt-auth": "0.5.*",
         "guzzlehttp/guzzle": "~6.0",
         "guzzlehttp/oauth-subscriber": "0.3.*",
-        "barryvdh/laravel-cors": "0.7.x"
+        "barryvdh/laravel-cors": "0.7.x",
+        "cviebrock/eloquent-sluggable": "^3.0",
+        "vtalbot/markdown": "^2.0",
+        "huddledigital/zendesk-laravel": "~1.0",
+        "faithpromise/fp-shared": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

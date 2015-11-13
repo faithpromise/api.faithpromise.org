@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d78a42ff7116392f1b48e524494633d4",
-    "content-hash": "6e81ceb956d1bedd61b1fb74cbd721d1",
+    "hash": "7ae8965e381a5dd0681e5a32ef27ddee",
+    "content-hash": "17f6762f09652221d3a27ea216bb9a4a",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -152,6 +152,118 @@
                 "preload"
             ],
             "time": "2015-06-28 21:39:13"
+        },
+        {
+            "name": "cocur/slugify",
+            "version": "v1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cocur/slugify.git",
+                "reference": "2b67d4e2b75dbaed2ebefa9eb5683e8940513847"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cocur/slugify/zipball/2b67d4e2b75dbaed2ebefa9eb5683e8940513847",
+                "reference": "2b67d4e2b75dbaed2ebefa9eb5683e8940513847",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "dev-master",
+                "laravel/framework": "~4.1",
+                "latte/latte": "~2.2",
+                "mockery/mockery": "~0.9",
+                "nette/di": "~2.2",
+                "phpunit/phpunit": "~3.7",
+                "sami/sami": "~1.3",
+                "satooshi/php-coveralls": "0.6.*",
+                "silex/silex": "~1.2",
+                "symfony/dependency-injection": "~2.4",
+                "symfony/http-kernel": "~2.4",
+                "twig/twig": "~1",
+                "zendframework/zend-modulemanager": "~2.2",
+                "zendframework/zend-servicemanager": "~2.2",
+                "zendframework/zend-view": "~2.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cocur\\Slugify\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ivo Bathke",
+                    "email": "ivo.bathke@gmail.com"
+                },
+                {
+                    "name": "Florian Eckerstorfer",
+                    "email": "florian@eckerstorfer.co",
+                    "homepage": "https://florian.ec"
+                }
+            ],
+            "description": "Converts a string into a slug.",
+            "keywords": [
+                "slug",
+                "slugify"
+            ],
+            "time": "2015-03-18 08:21:30"
+        },
+        {
+            "name": "cviebrock/eloquent-sluggable",
+            "version": "3.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cviebrock/eloquent-sluggable.git",
+                "reference": "ae6bc5271ca148e35a5c3ed799a9df2bf092728b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cviebrock/eloquent-sluggable/zipball/ae6bc5271ca148e35a5c3ed799a9df2bf092728b",
+                "reference": "ae6bc5271ca148e35a5c3ed799a9df2bf092728b",
+                "shasum": ""
+            },
+            "require": {
+                "cocur/slugify": "1.1.*",
+                "illuminate/config": "5.*",
+                "illuminate/database": "5.*",
+                "illuminate/support": "5.*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "3.0.*",
+                "phpunit/phpunit": "4.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cviebrock\\EloquentSluggable\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Colin Viebrock",
+                    "email": "colin@viebrock.ca"
+                }
+            ],
+            "description": "Easy creation of slugs for your Eloquent models in Laravel",
+            "homepage": "https://github.com/cviebrock/eloquent-sluggable",
+            "keywords": [
+                "eloquent",
+                "laravel",
+                "slug"
+            ],
+            "time": "2015-11-07 17:14:22"
         },
         {
             "name": "danielstjules/stringy",
@@ -308,6 +420,44 @@
                 "string"
             ],
             "time": "2014-12-20 21:24:13"
+        },
+        {
+            "name": "faithpromise/fp-shared",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/faithpromise/fp-shared.git",
+                "reference": "931152505cd9cc0532b4ba6dfe9d5a0e1be23217"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/faithpromise/fp-shared/zipball/931152505cd9cc0532b4ba6dfe9d5a0e1be23217",
+                "reference": "931152505cd9cc0532b4ba6dfe9d5a0e1be23217",
+                "shasum": ""
+            },
+            "require": {
+                "cviebrock/eloquent-sluggable": "^3.0",
+                "laravel/framework": "5.1.*",
+                "vtalbot/markdown": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FaithPromise\\Shared\\": "src"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Brad Roberts",
+                    "email": "brad@bradroberts.net"
+                }
+            ],
+            "description": "Shared application logic",
+            "support": {
+                "source": "https://github.com/faithpromise/fp-shared/tree/master",
+                "issues": "https://github.com/faithpromise/fp-shared/issues"
+            },
+            "time": "2015-11-13 03:12:04"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -530,6 +680,45 @@
                 "uri"
             ],
             "time": "2015-08-15 19:32:36"
+        },
+        {
+            "name": "huddledigital/zendesk-laravel",
+            "version": "v1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/huddledigital/zendesk-laravel.git",
+                "reference": "ffbb45ba01bc3fab6fdaae09387aa1c2fe27fc69"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/huddledigital/zendesk-laravel/zipball/ffbb45ba01bc3fab6fdaae09387aa1c2fe27fc69",
+                "reference": "ffbb45ba01bc3fab6fdaae09387aa1c2fe27fc69",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "5.*",
+                "php": ">=5.4.0",
+                "zendesk/zendesk_api_client_php": "~1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Huddle\\Zendesk\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Huddle Digital Ltd",
+                    "email": "info@workwithhuddle.com"
+                }
+            ],
+            "description": "Laravel wrapper for zendesk/zendesk_api_client_php package",
+            "homepage": "http://workwithhuddle.com",
+            "keywords": [
+                "Zendesk"
+            ],
+            "time": "2015-06-02 11:47:52"
         },
         {
             "name": "jakub-onderka/php-console-color",
@@ -888,6 +1077,57 @@
                 "storage"
             ],
             "time": "2015-09-30 22:26:59"
+        },
+        {
+            "name": "michelf/php-markdown",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michelf/php-markdown.git",
+                "reference": "e1aabe18173231ebcefc90e615565742fc1c7fd9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/e1aabe18173231ebcefc90e615565742fc1c7fd9",
+                "reference": "e1aabe18173231ebcefc90e615565742fc1c7fd9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-lib": "1.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Michelf": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "John Gruber",
+                    "homepage": "http://daringfireball.net/"
+                },
+                {
+                    "name": "Michel Fortin",
+                    "email": "michel.fortin@michelf.ca",
+                    "homepage": "https://michelf.ca/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP Markdown",
+            "homepage": "https://michelf.ca/projects/php-markdown/",
+            "keywords": [
+                "markdown"
+            ],
+            "time": "2015-03-01 12:03:08"
         },
         {
             "name": "monolog/monolog",
@@ -2313,6 +2553,91 @@
                 "environment"
             ],
             "time": "2015-05-30 15:59:26"
+        },
+        {
+            "name": "vtalbot/markdown",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vtalbot/markdown.git",
+                "reference": "051fec3d9208bf9dd3b5286716b8d39c7a3c525f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vtalbot/markdown/zipball/051fec3d9208bf9dd3b5286716b8d39c7a3c525f",
+                "reference": "051fec3d9208bf9dd3b5286716b8d39c7a3c525f",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "~5.0",
+                "michelf/php-markdown": "1.5.x"
+            },
+            "require-dev": {
+                "mockery/mockery": "0.9.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "VTalbot\\Markdown": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vincent Talbot",
+                    "email": "vincent.talbot@gmail.com"
+                }
+            ],
+            "description": "Markdown compiler for Laravel 4",
+            "keywords": [
+                "illuminate",
+                "laravel",
+                "markdown",
+                "md"
+            ],
+            "time": "2015-09-18 03:51:16"
+        },
+        {
+            "name": "zendesk/zendesk_api_client_php",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendesk/zendesk_api_client_php.git",
+                "reference": "32e7e950753d89c8d815e0914f36b0bb4adabd29"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendesk/zendesk_api_client_php/zipball/32e7e950753d89c8d815e0914f36b0bb4adabd29",
+                "reference": "32e7e950753d89c8d815e0914f36b0bb4adabd29",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Zendesk\\API\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache License Version 2.0"
+            ],
+            "description": "PHP Client for Zendesk REST API. See http://developer.zendesk.com/api-docs",
+            "homepage": "https://github.com/zendesk/zendesk_api_client_php",
+            "time": "2015-05-31 00:16:34"
         }
     ],
     "packages-dev": [
@@ -3543,7 +3868,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "faithpromise/fp-shared": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
